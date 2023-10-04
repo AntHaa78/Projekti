@@ -1,0 +1,488 @@
+#include <stdio.h>
+#include <pigpio.h>
+#include <signal.h>
+
+
+
+Harjoitus 1+2: Hello world + 3 flashing lights
+
+int pin1 = 21;
+int pin2 = 20;
+int pin3 = 16;
+
+
+int main(){
+	//printf("hello world");
+	if (gpioInitialise() < 0)
+{
+   printf("pigpio initialisation failed.");
+}
+else
+{
+	printf("pigpio initialised okay");
+	
+	/*char x;
+	printf("nEnter R to light up the led: " );
+	scanf("%c", &x);
+	if (x=='R'){*/
+	gpioSetMode(pin1, PI_OUTPUT);
+	gpioSetMode(pin2, PI_OUTPUT);
+	gpioSetMode(pin3, PI_OUTPUT);
+	gpioWrite(pin1, 1);
+	time_sleep(1);
+	gpioWrite(pin1, 0);
+	gpioWrite(pin2, 1);
+	time_sleep(1);
+	gpioWrite(pin2, 0);
+	gpioWrite(pin3, 1);
+	time_sleep(1);
+	gpioWrite(pin3, 0);
+
+	
+}
+	gpioTerminate();
+	return 0;
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+  Harjoitus 3: PWM Light Control
+
+int pin1 = 21;
+int pin2 = 20;
+int pin3 = 16;
+int analogpin= 12;
+int val=0;
+
+
+int main(){
+		//printf("hello world");
+	if (gpioInitialise() < 0)
+{
+   printf("pigpio initialisation failed.");
+}
+else
+{
+	printf("pigpio initialised okay");
+	
+	//char x;
+	//printf("nEnter R to light up the led: " );
+	//scanf("%c", &x);
+	//if (x=='R'){
+	//gpioSetMode(analogpin, PI_OUTPUT);
+	
+	
+	//gpioWrite(pin, 1);
+	
+	
+	/*gpioPWM(pin, 255);
+	time_sleep(2);
+	gpioPWM(pin, 128);
+	time_sleep(2);
+	gpioPWM(pin, 0);
+	time_sleep(2);
+	*/
+}
+	
+	gpioTerminate();
+	return 0;
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+  Harjoitus 4 : Traffic lights
+
+int pin1 = 21;
+int pin2 = 20;
+int pin3 = 16;
+
+
+int main(){
+	
+	if (gpioInitialise() < 0)
+{
+   printf("pigpio initialisation failed.");
+}
+else
+{
+	printf("pigpio initialised okay");
+	
+	/*char x;
+	printf("nEnter R to light up the led: " );
+	scanf("%c", &x);
+	if (x=='R'){*/
+  
+	gpioSetMode(pin1, PI_OUTPUT);
+	gpioSetMode(pin2, PI_OUTPUT);
+	gpioSetMode(pin3, PI_OUTPUT);
+	
+	gpioWrite(pin1, 1);
+	//gpioWrite(pin2, 1);
+	//gpioWrite(pin3, 1);
+	time_sleep(2.5);
+	gpioWrite(pin1, 0);
+	//gpioWrite(pin2, 0);
+	//gpioWrite(pin3, 0);
+	
+	for(int i =0; i < 6; i++){
+		gpioWrite(pin2, 1);
+		time_sleep(0.25);
+		gpioWrite(pin2, 0);
+		time_sleep(0.25);
+	}
+	
+	gpioWrite(pin3, 1);
+	time_sleep(2.5);
+	gpioWrite(pin3, 0);
+
+	
+}
+	gpioTerminate();
+	return 0;
+}
+
+-----------------------------------------------------------------------------------------------------
+
+  Harjoitus 5 : LED chasing effect 
+
+int pin1 = 21;
+int pin2 = 20;
+int pin3 = 16;
+int pin4 = 1;
+int pin5 = 7;
+int pin6 = 8;
+float aika = 0.07;
+
+int main(){
+	//printf("hello world");
+	if (gpioInitialise() < 0)
+{
+   printf("pigpio initialisation failed.");
+}
+else
+{
+	printf("pigpio initialised okay");
+	
+	/*char x;
+	printf("nEnter R to light up the led: " );
+	scanf("%c", &x);
+	if (x=='R'){*/
+	gpioSetMode(pin1, PI_OUTPUT);
+	gpioSetMode(pin2, PI_OUTPUT);
+	gpioSetMode(pin3, PI_OUTPUT);
+	gpioSetMode(pin4, PI_OUTPUT);
+	gpioSetMode(pin5, PI_OUTPUT);
+	gpioSetMode(pin6, PI_OUTPUT);
+	
+	for (int i=0;i<9;i++){
+	
+	gpioWrite(pin1, 1);
+	time_sleep(aika);
+	gpioWrite(pin2, 1);
+	gpioWrite(pin4, 0);
+	time_sleep(aika);
+	gpioWrite(pin1, 0);
+	gpioWrite(pin3, 1);
+	time_sleep(aika);
+	gpioWrite(pin2, 0);
+	gpioWrite(pin6, 1);
+	time_sleep(aika);
+	gpioWrite(pin3, 0);
+	gpioWrite(pin5, 1);
+	time_sleep(aika);
+	gpioWrite(pin6, 0);
+	gpioWrite(pin4, 1);
+	time_sleep(aika);
+	gpioWrite(pin5, 0);
+	}
+	gpioWrite(pin4, 0);
+}
+	gpioTerminate();
+	return 0;
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Harjoitus 6 : Button controlled LED
+
+int pin1 = 21;
+int pin2 = 20;
+
+
+void triggerLED(int gpio, int level, uint32_t tick){
+	if(gpioRead(pin1) == 0){
+		gpioWrite(pin1, 1);
+	}
+	else{	
+		gpioWrite(pin1, 0);
+	}
+	
+	
+	}
+
+
+int main(){
+	//printf("hello world");
+	if (gpioInitialise() < 0)
+{
+   printf("pigpio initialisation failed.");
+}
+else
+{
+	printf("pigpio initialised okay");
+	
+	int test = gpioGetMode(20);
+	printf("\n%d", test);
+	
+	//if(gpioInitialise() > 0)
+	//{
+		gpioSetMode(pin1, PI_OUTPUT);
+		gpioSetMode(pin2, PI_INPUT);
+		
+			
+		gpioSetAlertFunc(pin1, triggerLED);
+		
+		while(1)
+	{
+	}
+	
+	
+	
+	
+	
+		
+	/*gpioWrite(pin1, 1);
+	time_sleep(aika);
+	gpioWrite(pin1, 0);
+	
+}
+	gpioTerminate();
+	return 0;
+}
+
+
+
+/*
+static int LED_gpio = 21;
+static int Button_gpio = 20;
+
+int main()
+{
+    int status = gpioInitialise();
+
+    if (status > 0)
+    {
+        gpioSetMode(LED_gpio, PI_OUTPUT);
+        gpioSetMode(Button_gpio, PI_INPUT);
+
+        
+        while (1)
+        {
+            if (gpioRead(Button_gpio)==1){
+                gpioWrite(LED_gpio, 1);
+            } else{
+                gpioWrite(LED_gpio, 0);
+            }
+        } 
+    }
+    gpioTerminate();
+
+    return 0;
+}
+*/
+
+--------------------------------------------------------------------------------------------------
+
+  Harjoitus 7 : Responder experiment
+
+//ledit
+
+
+const int pin1 = 21;
+const int pin2 = 20;
+const int pin3 = 16;
+
+//napit
+const int pin11 = 26;
+const int pin22 = 5;
+const int pin33 = 13;
+
+//reset
+const int pin444 = 6;
+
+int LED_red = pin1;
+int LED_yellow = pin2;
+int LED_green = pin3;
+
+int Button_red = pin11;
+int Button_yellow = pin22;
+int Button_green = pin33;
+
+int Button_reset = pin444;
+
+int red,green,yellow,reset;
+
+
+
+
+
+void kaikki_reset(){
+		gpioWrite(LED_red, 0);
+		gpioWrite(LED_yellow, 0);
+		gpioWrite(LED_green, 0); 
+}
+
+void red_yes(){
+		gpioWrite(LED_red, 1);
+		gpioWrite(LED_yellow, 0);
+		gpioWrite(LED_green, 0);
+}
+
+void yellow_yes(){
+		gpioWrite(LED_red, 0);
+		gpioWrite(LED_yellow, 1);
+		gpioWrite(LED_green, 0);
+}
+
+void green_yes(){
+		gpioWrite(LED_red, 0);
+		gpioWrite(LED_yellow, 0);
+		gpioWrite(LED_green, 1);
+}
+
+
+
+int main(){
+	
+    int status = gpioInitialise();
+
+    if (status > 0)
+    {
+     
+	gpioSetMode(LED_red, PI_OUTPUT);
+	gpioSetMode(Button_red, PI_INPUT);
+
+	gpioSetMode(LED_yellow, PI_OUTPUT);
+	gpioSetMode(Button_yellow, PI_INPUT);
+
+	gpioSetMode(LED_green, PI_OUTPUT);
+	gpioSetMode(Button_green, PI_INPUT);
+        
+        while (1)
+        {
+            red = gpioRead(Button_red);
+            green = gpioRead(Button_green);
+            yellow = gpioRead(Button_yellow);
+            reset = gpioRead(Button_reset);
+            
+            if (red==0){
+				red_yes();
+				
+			}
+				
+								
+            if (yellow==0){
+				yellow_yes();
+				
+			} 
+			
+            if (green==0){
+				green_yes();
+				
+			}
+			
+			if (reset==0){
+				kaikki_reset();
+				break;
+			}
+
+		}
+		
+	}
+	
+    gpioTerminate();
+
+    return 0;
+}
+
+---------------------------------------------------------------------------------------------------------------
+
+  Harjoitus 8: Active buzzer
+
+int buzzer = 21;
+char x;
+
+int main(){
+	int status = gpioInitialise();
+
+    if (status > 0)
+    {
+	gpioSetMode(buzzer, PI_OUTPUT);
+	
+	//printf("Enter p to play a nice sound");
+	//scanf("%c", &x);
+	//if (x=='p'){
+		//gpioWrite(buzzer,1);
+	//}
+	
+	
+	gpioWrite(buzzer, 1);
+	time_sleep(1);
+	gpioWrite(buzzer, 0);
+	
+	}
+	gpioTerminate();
+}
+
+---------------------------------------------------------------------------------------------------------
+
+  Harjoitus 9 : Passive buzzer
+
+int buzzer = 13;
+char x;
+
+int main(){
+	int status = gpioInitialise();
+
+    if (status > 0)
+    {
+	gpioSetMode(buzzer, PI_OUTPUT);
+	
+	//printf("Enter p to play a nice sound");
+	//scanf("%c", &x);
+	//if (x=='p'){
+		//gpioWrite(buzzer,1);
+	//}
+	
+	//for(int i = 0; i < 10; i++){
+	//	gpioWrite(buzzer, 1);
+	//	time_sleep(1);
+	//	gpioWrite(buzzer, 0);
+	//}
+	
+
+	gpioPWM(buzzer, 50);
+	time_sleep(0.2);
+	gpioPWM(buzzer, 5);
+	time_sleep(0.2);
+	gpioPWM(buzzer, 15);
+	time_sleep(0.2);
+	gpioPWM(buzzer, 35);
+	time_sleep(0.2);
+
+	/*
+	for (int i=50;i>0;i--) {
+	gpioPWM(buzzer, i);
+	time_sleep(0.02);
+	}
+	*/
+
+	gpioPWM(buzzer, 0);
+	}
+	gpioTerminate();
+}
+
+------------------------------------------------------------------------------ 
+  
+  Harjoitus 10 : 
+
