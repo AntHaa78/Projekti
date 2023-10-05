@@ -484,5 +484,196 @@ int main(){
 
 ------------------------------------------------------------------------------ 
   
-  Harjoitus 10 : 
+  Harjoitus 10 : Read Analog Values
+
+int buzzer = 13;
+int a;
+
+int main(){
+	int status = gpioInitialise();
+
+    if (status > 0)
+    {
+	
+	//a=gpioGetPWMdutycycle(buzzer);
+	a=gpioGetPWMrealRange(buzzer);
+	printf("\n%d", a);
+	
+	}
+	gpioTerminate();
+}
+
+
+--------------------------------------------------------------------------------------------------
+
+harjoitus 11 : Light Dependent Resistor
+
+int led_pin = 21;
+int pot_pin= 13;
+int val;
+int trueval;
+int testi;
+
+int main(){
+	int status = gpioInitialise();
+
+    if (status > 0)
+    {
+	
+	gpioSetMode(led_pin, PI_OUTPUT);
+	
+	
+	for (int i=0;i<10;i++)
+	{
+	val = gpioRead(pot_pin);
+	trueval=abs(1-val);
+	printf("\n%d", val);
+	printf("\n%d", trueval);
+	//gpioWrite(pot_pin, 1);
+	//testi = gpioRead(pot_pin);
+	//printf("\n%d", testi);
+	gpioWrite(led_pin, trueval);
+	time_sleep(1);
+	}
+	
+	}
+	gpioTerminate();
+}
+
+-------------------------------------------------------------------------------------------------------
+
+Harjoitus 12: Flame Sensor
+Harjoitus 13: Tilt Switch
+
+Ei tehty, analog ongelma.
+
+------------------------------------------------------------------------------------------------------------
+
+Harjoitus 14 : 1-Digit LED Segment-Display
+
+int a = 21; //keskimmäinen
+int b = 8;  //vasen alhaalla
+int c = 20; // vasen ylhäällä
+int d = 25; // ylin
+int e = 19; // oikea ylhäällä
+int f = 6;  // oikea alhaalla
+int g = 7;  // alin
+int dp = 5; //piste
+
+
+void dig_0(){
+		gpioWrite(a, 0);
+		gpioWrite(b, 1);
+		gpioWrite(c, 1);
+		gpioWrite(d, 1);
+		gpioWrite(e, 1);
+		gpioWrite(f, 1);
+		gpioWrite(g, 1);
+		gpioWrite(dp, 0);
+
+}
+
+void dig_5(){
+		gpioWrite(a, 1);
+		gpioWrite(b, 0);
+		gpioWrite(c, 1);
+		gpioWrite(d, 1);
+		gpioWrite(e, 0);
+		gpioWrite(f, 1);
+		gpioWrite(g, 1);
+		gpioWrite(dp, 0);
+
+}
+
+int main(){
+	int status = gpioInitialise();
+
+    if (status > 0)
+    {
+	gpioSetMode(a, PI_OUTPUT);
+	gpioSetMode(b, PI_OUTPUT);
+	gpioSetMode(c, PI_OUTPUT);
+	gpioSetMode(d, PI_OUTPUT);
+	gpioSetMode(e, PI_OUTPUT);
+	gpioSetMode(f, PI_OUTPUT);
+	gpioSetMode(g, PI_OUTPUT);
+	gpioSetMode(dp, PI_OUTPUT);
+	
+	dig_0();
+	
+	
+	}
+	gpioTerminate();
+}
+
+---------------------------------------------------------------------------------------------------
+
+Harjoitus 15 : 4-Digit LED Segment-Display
+
+int a = 21; //keskimmäinen
+int b = 20;  //vasen alhaalla
+int c = 16; // vasen ylhäällä
+int d = 12; // ylin
+int e = 1; // oikea ylhäällä
+int f = 7;  // oikea alhaalla
+int g = 26;  // alin
+int h = 19; //piste
+int i = 13;
+int j = 6;
+int k = 5;
+int l = 0;
+
+
+void dig_0(){
+		gpioWrite(a, 1);
+		gpioWrite(b, 1);
+		gpioWrite(c, 1);
+		gpioWrite(d, 1);
+		gpioWrite(e, 1);
+		gpioWrite(f, 1);
+		gpioWrite(g, 1);
+		gpioWrite(h, 1);
+		gpioWrite(i, 1);
+		gpioWrite(j, 1);
+		gpioWrite(k, 1);
+		gpioWrite(l, 1);
+
+}
+
+void dig_5(){
+		gpioWrite(a, 1);
+		gpioWrite(b, 0);
+		gpioWrite(c, 1);
+		gpioWrite(d, 1);
+		gpioWrite(e, 0);
+		gpioWrite(f, 1);
+		gpioWrite(g, 1);
+		//gpioWrite(dp, 0);
+
+}
+
+int main(){
+	int status = gpioInitialise();
+
+    if (status > 0)
+    {
+	gpioSetMode(a, PI_OUTPUT);
+	gpioSetMode(b, PI_OUTPUT);
+	gpioSetMode(c, PI_OUTPUT);
+	gpioSetMode(d, PI_OUTPUT);
+	gpioSetMode(e, PI_OUTPUT);
+	gpioSetMode(f, PI_OUTPUT);
+	gpioSetMode(g, PI_OUTPUT);
+	gpioSetMode(h, PI_OUTPUT);
+	gpioSetMode(i, PI_OUTPUT);
+	gpioSetMode(j, PI_OUTPUT);
+	gpioSetMode(k, PI_OUTPUT);
+	gpioSetMode(l, PI_OUTPUT);
+	
+	dig_0();
+	
+	
+	}
+	gpioTerminate();
+}
 
