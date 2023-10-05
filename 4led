@@ -1,0 +1,211 @@
+int top = 0;
+int top_right = 0;
+int bot_right = 0;
+int bot= 0;
+int bot_left = 0;
+int top_left =0;
+int middle =0;
+int dots =0;
+
+int n1 = 0;
+int n2 = 0;
+int n3 = 0;
+int n4 = 0;
+
+long n = 1234;
+int x =100;
+int del = 3;
+//int count=0;
+
+void pickDigit(int x){
+    gpioWrite(n1, 1);
+    gpioWrite(n2, 1);
+    gpioWrite(n3, 1);
+    gpioWrite(n4, 1);
+
+    switch (x)
+    {
+    case 0:
+    gpioWrite(n1, 0);
+    break;
+    case 1:
+    gpioWrite(n2, 0);
+    break;
+    case 2:
+    gpioWrite(n3, 0);
+    break;
+    default:
+    gpioWrite(n4, 0);
+    break;
+    }
+}
+
+void pickNumber(int x){
+    switch (x)
+    {
+    
+    default:
+    zero();
+    break;
+    case 1:
+    one();
+    break;
+    case 2:
+    two();
+    break;
+    case 3:
+    three();
+    break;
+    case 4:
+    four();
+    break;
+    case 5:
+    five();
+    break;
+    case 6:
+    six();
+    break;
+    case 7:
+    seven();
+    break;
+    case 8:
+    eight();
+    break;
+    case 9:
+    nine();
+    break; 
+    }
+}
+
+void clearLEDs(){
+    gpioWrite(top, 0);
+    gpioWrite(top_right, 0);
+    gpioWrite(top_left, 0);
+    gpioWrite(bot_right, 0);
+    gpioWrite(bot_left, 0);
+    gpioWrite(bot, 0);
+    gpioWrite(middle, 0);
+    gpioWrite(dots, 0);
+}
+
+void zero(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 1);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 1);
+    gpioWrite(bot, 1);
+    gpioWrite(middle, 0);
+}
+
+void one(){
+    gpioWrite(top, 0);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 1);
+    gpioWrite(bot_right, 0);
+    gpioWrite(bot_left, 0);
+    gpioWrite(bot, 0);
+    gpioWrite(middle, 0);
+}
+
+void two(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 0);
+    gpioWrite(bot_right, 0);
+    gpioWrite(bot_left, 1);
+    gpioWrite(bot, 1);
+    gpioWrite(middle, 1);
+}
+
+void three(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 0);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 0);
+    gpioWrite(bot, 1);
+    gpioWrite(middle, 1);
+}
+
+void four(){
+    gpioWrite(top, 0);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 1);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 0);
+    gpioWrite(bot, 0);
+    gpioWrite(middle, 1);
+}
+
+void five(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 0);
+    gpioWrite(top_left, 1);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 0);
+    gpioWrite(bot, 1);
+    gpioWrite(middle, 1);
+}
+
+void six(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 0);
+    gpioWrite(top_left, 1);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 1);
+    gpioWrite(bot, 1);
+    gpioWrite(middle, 1);
+}
+
+void seven(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 0);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 0);
+    gpioWrite(bot, 0);
+    gpioWrite(middle, 1);
+}
+
+void eight(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 1);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 1);
+    gpioWrite(bot, 1);
+    gpioWrite(middle, 1);
+}
+
+void nine(){
+    gpioWrite(top, 1);
+    gpioWrite(top_right, 1);
+    gpioWrite(top_left, 1);
+    gpioWrite(bot_right, 1);
+    gpioWrite(bot_left, 0);
+    gpioWrite(bot, 0);
+    gpioWrite(middle, 1);
+}
+
+int main(){
+    clearLEDs();
+    pickDigit(0);
+    pickNumber((n/1000));
+    delay(del);
+
+    clearLEDs();
+    pickDigit(1);
+    pickNumber(((n%1000)/100));
+    delay(del);
+
+    clearLEDs();
+    pickDigit(2);
+    pickNumber(((n%100)/10));
+    delay(del);
+
+    clearLEDs();
+    pickDigit(3);
+    pickNumber((n%10));
+    delay(del);    
+}
