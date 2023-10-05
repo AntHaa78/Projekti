@@ -1,20 +1,25 @@
-int top = 0;
-int top_right = 0;
-int bot_right = 0;
-int bot= 0;
-int bot_left = 0;
-int top_left =0;
-int middle =0;
-int dots =0;
+#include <stdio.h>
+#include <pigpio.h>
+#include <signal.h>
 
-int n1 = 0;
-int n2 = 0;
-int n3 = 0;
-int n4 = 0;
 
-long n = 1234;
+int top = 05;
+int top_right = 22;
+int bot_right = 25;
+int bot= 24;
+int bot_left = 21;
+int top_left =13;
+int middle =19;
+int dots =06;
+
+int n1 = 26;
+int n2 = 20;
+int n3 = 16;
+int n4 = 23;
+
+long n = 5455;
 int x =100;
-int del = 3;
+float del = 1;
 //int count=0;
 
 void pickDigit(int x){
@@ -40,42 +45,7 @@ void pickDigit(int x){
     }
 }
 
-void pickNumber(int x){
-    switch (x)
-    {
-    
-    default:
-    zero();
-    break;
-    case 1:
-    one();
-    break;
-    case 2:
-    two();
-    break;
-    case 3:
-    three();
-    break;
-    case 4:
-    four();
-    break;
-    case 5:
-    five();
-    break;
-    case 6:
-    six();
-    break;
-    case 7:
-    seven();
-    break;
-    case 8:
-    eight();
-    break;
-    case 9:
-    nine();
-    break; 
-    }
-}
+
 
 void clearLEDs(){
     gpioWrite(top, 0);
@@ -101,8 +71,8 @@ void zero(){
 void one(){
     gpioWrite(top, 0);
     gpioWrite(top_right, 1);
-    gpioWrite(top_left, 1);
-    gpioWrite(bot_right, 0);
+    gpioWrite(top_left, 0);
+    gpioWrite(bot_right, 1);
     gpioWrite(bot_left, 0);
     gpioWrite(bot, 0);
     gpioWrite(middle, 0);
@@ -188,24 +158,89 @@ void nine(){
     gpioWrite(middle, 1);
 }
 
+void pickNumber(int x){
+    switch (x)
+    {
+    
+    default:
+    zero();
+    break;
+    case 1:
+    one();
+    break;
+    case 2:
+    two();
+    break;
+    case 3:
+    three();
+    break;
+    case 4:
+    four();
+    break;
+    case 5:
+    five();
+    break;
+    case 6:
+    six();
+    break;
+    case 7:
+    seven();
+    break;
+    case 8:
+    eight();
+    break;
+    case 9:
+    nine();
+    break; 
+    }
+}
+
 int main(){
+    
+    int status = gpioInitialise();
+
+    if (status > 0)
+    {
+	gpioSetMode(top, PI_OUTPUT);
+	gpioSetMode(top_right, PI_OUTPUT);
+	gpioSetMode(top_left, PI_OUTPUT);
+	gpioSetMode(middle, PI_OUTPUT);
+	gpioSetMode(bot, PI_OUTPUT);
+	gpioSetMode(bot_right, PI_OUTPUT);
+	gpioSetMode(bot_left, PI_OUTPUT);
+	gpioSetMode(dots, PI_OUTPUT);
+	gpioSetMode(n1, PI_OUTPUT);
+	gpioSetMode(n2, PI_OUTPUT);
+	gpioSetMode(n3, PI_OUTPUT);
+	gpioSetMode(n4, PI_OUTPUT);
+    
+    
     clearLEDs();
     pickDigit(0);
     pickNumber((n/1000));
-    delay(del);
+    //delay(del);
+    time_sleep(del);
 
     clearLEDs();
     pickDigit(1);
     pickNumber(((n%1000)/100));
-    delay(del);
+    //delay(del);
+    time_sleep(del);
 
-    clearLEDs();
+    //clearLEDs();
     pickDigit(2);
     pickNumber(((n%100)/10));
-    delay(del);
+    //delay(del);
+    time_sleep(del);
 
-    clearLEDs();
+    //clearLEDs();
     pickDigit(3);
     pickNumber((n%10));
-    delay(del);    
+    //delay(del);   
+    time_sleep(del); 
+    
+    clearLEDs();
+    
+    }
+	gpioTerminate();
 }
