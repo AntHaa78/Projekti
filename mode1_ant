@@ -1,0 +1,27 @@
+from gpiozero import LED, Button
+import time
+from signal import pause
+
+# Pin and button numbers 
+led = LED(17)
+button = Button(2)
+
+b""" utton.when_pressed = led.on
+button.when_released = led.off """
+
+def presstime():
+    time_seconds = time.time()
+    return time_seconds
+
+def showtime():
+    time_seconds = time.time()
+    t = time.ctime(time_seconds)
+    print("It is now", t)
+
+def combinfun():
+    presstime()
+    showtime()
+
+button.when_pressed = combinfun
+
+pause()
