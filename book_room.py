@@ -33,3 +33,15 @@ mode_chosen=int(input("Please choose a mode (1-3): "))
 
 if mode_chosen==1:
     going_in()
+
+def print_going_in():
+    print("GOING IN")
+
+def going_in():
+    lastmotion = time.time()
+    motionseconds = time.time() - lastmotion 
+    pir1.close()
+    while motionseconds<5:
+        motion5s = 1
+        pir2.when_motion = print_going_in
+    
