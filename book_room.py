@@ -1,3 +1,11 @@
+# Aim : Detect motion from sensor 1 or sensor 2 first.
+# Pause/desactivate the sensor that has been activated for 3 secs.
+# Start a timer to wait if other sensor is activated within these 3secs. Depending on order -> Going in / Going out
+# If other sensor has not been activated, reactivate first sensor
+# Endless loop
+
+
+
 from gpiozero import LED, MotionSensor
 import time
 from datetime import datetime
@@ -13,7 +21,7 @@ pir2 = MotionSensor(17)
 lastmotion = 0       
 motion5s = 0
 
-def going_in():
+def going_direction(num):
     while True:
         if pir1.motion_detected == True:
             lastmotion = time.time()
