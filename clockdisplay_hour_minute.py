@@ -2,6 +2,7 @@ from sense_hat import SenseHat
 import time
 
 sense = SenseHat()
+sense.clear()
 
 number = [
 [[0,1,1,1], # Zero
@@ -104,3 +105,10 @@ def display_hour_minute(hour, minute):
     #sense.set_rotation(90) # Optional
     #sense.low_light = True # Optional
     sense.set_pixels(clockImage)
+
+print("Enter the time you want to dislpay")
+hour = int(input("Hour:"))
+minute = int(input("Minute: "))
+display_hour_minute(hour, minute)
+time.sleep(5)
+sense.clear()
