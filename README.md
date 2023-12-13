@@ -6,7 +6,7 @@ Sulautetun ohjelmoinnin osaaja - Raspberry Pi projekti with motion sensors
 
 (main joystick + modes) : Program working WITH raspberry Pi.
 
-
+------------------------------------------------------------------------------------------------------------------------------------------
 
 old.py : All stored old functions and variables
 
