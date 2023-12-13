@@ -3,7 +3,7 @@
 #from gpiozero import MotionSensor
 #from datetime import datetime
 #from signal import pause
-from Modes_term import *
+from modes_term import *
 
 
 global activeMode
