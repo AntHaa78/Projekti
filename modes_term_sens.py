@@ -4,7 +4,7 @@ from datetime import timedelta
 import random
 import string
 from gpiozero import LED, MotionSensor
-#import keyboard # Used to simulate sensors in testings without raspberry pi AND to exit modes at any time, not to delete.
+#import keyboard # Used to simulate sensors in testings without raspberry pi AND to exit modes at any time, not to delete. May cause errors
 from clockdisplay_minute_second import *
 
 #from sense_hat import SenseHat
@@ -70,7 +70,7 @@ def password_generator(): # basic password generator function, only lower case l
 
 def mode_one(): # Function one to reserve room
     details=0 # variable used to check if user name/pw are correct
-    room_occupied = 0
+    #room_occupied = 0
 
     motion_last_detected = 0 # counter to check when the person was last in room
     max_time_out_of_room = 5 # adjust time (in seconds for test, for real use probably minutes) a person cna be outside the room while its reserved
@@ -148,10 +148,10 @@ def mode_one(): # Function one to reserve room
                 #print("To simulate motion sensor: press 'x' to detect Motion 1(outside) and 'y' to detect motion 2 (inside)")
                 print_status=False  
 
-        if keyboard.is_pressed("e"): #exit mode alarm
-            print("\nMode ROOM booking exited successfully")
-            sense.clear()
-            break
+        #if keyboard.is_pressed("e"): #exit mode alarm
+        #    print("\nMode ROOM booking exited successfully")
+        #    sense.clear()
+        #    break
 
         elif print_status: # if hour is not yet reached start time
             print(f"\nNo reservation at {hour}. Next reservation at {start_time}") 
@@ -176,28 +176,30 @@ def mode_two():
     print("\nAlarm iniated at", datetime.now(), "until", countdown_to, "\n")
 
     while datetime.now() < countdown_to: # loop through time until countdown reached
-        if (pir1.motion_detected == True or pir2.motion_detected == True): 
+        if pir2.motion_detected == True: #or pir2.motion_detected == True): 
             prRed("INTRUDER INTRUDER INTRUDER INTRUDER INTRUDER INTRUDER")
-            sense.show_message("INTRUDER", text_colour=red)
+            
             while True: # loop to turn off alarm
+                #sense.show_message("INTRUDER", text_colour=red)
+                sense.show_letter("!", text_colour=red)
                 answer=input("Please enter password to desactivate alarm: ")
                 if answer == password:
                     print("Alarm desactivated, back to alarm mode")
-                    sense.show_message("ALARM ON")  
-                    (pir1.motion_detected == True or pir2.motion_detected == True)
+                    sense.show_letter("O")  
+                    #(pir1.motion_detected == True or pir2.motion_detected == True)
                     break
                 if answer == 'e':
                     sense.clear()
                     break
                 else:
                     print("Wrong password, alarm still beeping")          
-        if keyboard.is_pressed("e"): #exit mode alarm
-            print("\nMode ALARM exited successfully")
-            sense.clear()
-            break
+        #if keyboard.is_pressed("e"): #exit mode alarm
+        #    print("\nMode ALARM exited successfully")
+        #    sense.clear()
+        #    break
         elif print_status:
             print("ALARM MODE ON")
-            sense.show_message("ALARM ON")
+            sense.show_letter("O")
             print_status=False
 
 
@@ -220,7 +222,7 @@ def mode_three():
     #else:
     #    countdown_to = datetime(year,month,day,hour+hour_user,minutes)
 
-    countdown_to = datetime(year,month,day,hour,minute+1) # !!! TESTING !!! countdown (time+1minute) take bloc above for real use
+    countdown_to = datetime(year,month,day,hour,minute+2) # !!! TESTING !!! countdown (time+2minute) take bloc above for real use
     print("\nCountdown initiated at ", datetime.now(), "until", countdown_to, "\n")
 
 
@@ -232,38 +234,41 @@ def mode_three():
         #if datetime.now().minute != last_minute: #countdown every minute
             time_left_seconds = int((countdown_to - datetime.now()).total_seconds())
             time_converted = str(timedelta(seconds=time_left_seconds))
-            display_hour_minute(int(countdown), countdown)
+            display_minute_second(int(countdown)/60, countdown)
             print('Time left:', time_converted)
             #print('Time left:', int((countdown_to - datetime.now()).total_seconds() // 60), 'min') # if the countdown is in minute
             print('Time now:', datetime.now(), '\n')
             B=countdown           
             #last_minute = datetime.now().minute # if countdown in minutes 
 
-        if (pir1.motion_detected == True or pir2.motion_detected == True):
-            print("\nMotion detected, everybody alive!")
-            sense.set_pixels(smiley_face)
-            alive_status=1
-            answer = input("\nDo you want to automatically add 12 hours to the countdown? (y/n)")
-            if answer=="y":
-                hour_plus_twelve=datetime.now().hour+12
-                if hour_plus_twelve>23:
-                    hour_new = hour_plus_twelve-24
-                    day = datetime.now().day+1
-                    countdown_to = datetime(year,month,day,hour_new,minute)
-                else:
-                    countdown_to = datetime(year,month,day,hour_plus_twelve,minute)
-                print("\nCountdown initiated at ", datetime.now(), "until", countdown_to, "\n")
-                continue
-            elif answer=="n":
-                print("\nExiting MONITORING MODE")
-                sense.clear()
-                break
-
-        if keyboard.is_pressed("e"):
-            print("Mode exited, back to menu") 
-            sense.clear()
-            alive_status=2
+            if pir2.motion_detected == True: #or pir2.motion_detected == True):
+                print("\nMotion detected, everybody alive!")
+                sense.set_pixels(smiley_face)
+                alive_status=1
+                answer = input("\nDo you want to automatically add 12 hours to the countdown? (y/n)")
+                if answer=="y":
+                    hour_plus_twelve=datetime.now().hour+12
+                    if hour_plus_twelve>23:
+                        hour_new = hour_plus_twelve-24
+                        day = datetime.now().day+1
+                        countdown_to = datetime(year,month,day,hour_new,minute)
+                    else:
+                        countdown_to = datetime(year,month,day,hour_plus_twelve,minute)
+                    print("\nCountdown initiated at ", datetime.now(), "until", countdown_to, "\n")
+                    break
+                elif answer=="n":
+                    sense.clear()
+                    break
+        if answer=="y":
+            continue
+        if answer=="n":
+            print("\nExiting MONITORING MODE")
             break
+        #if keyboard.is_pressed("e"):
+        #    print("Mode exited, back to menu") 
+        #    sense.clear()
+        #    alive_status=2
+        #    break
 
         elif print_status:
            #print("(Press x or y to simulate sensors), e to exit")
