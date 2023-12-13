@@ -5,40 +5,38 @@ import random
 import string
 import keyboard # only to simulate sensor, can delete later
 
+
 # mode one - room reservation mode
 # For now, to check it make sure to select a start time before or equal to current hour and end time after current hour
 # Can select hour that already passed
-# To implement later : days, and error if selecting passed hour
+# To implement later : days, and error if selecting passed hour when reserving. Add counter for another person enter the room then make sure room is empty at the end.
 
 
-# mode two
+# mode two - Alarm mode
+# When going to work, going on holidays etc... and house is empty. Activate alarm until desired date. For now only same day for testing purposes, easily modifiable.
+# once motion is detected -> alarm beeps. need to answer password to desactivate alarm
 
 
+# mode three - monitoring mode (ex: retirement homes)
+# check if any motion at all during the amount of hours selected. Can also be modified later
 
 
-
-# mode three 
-
+# creation of quick method prRed to print in red in terminal
 def prRed(skk): print("\033[91m {}\033[00m" .format(skk))
 
+#password used for mode two
 password = "abc123"
 
-
-
-
-
-
-
+# Color codes for showing colors on sense hat
 blue = (0,0,255)
 green = (0, 255, 0)
 red = (255, 0, 0) 
 yellow = (255,255,0)
 black = (0,0,0)
 
-
+# To display a yellow smiley on the sense hat
 X = yellow
 O = black  
-
 smiley_face = [
 O, O, O, O, O, O, O, O,
 O, O, X, O, X, O, O, O,
@@ -98,7 +96,8 @@ def mode_one(): # Function one to reserve room
                         
                             if keyboard.is_pressed("y"):
                                 
-                                print(f"\nYou exited the room! If you're not back within {max_time_out_of_room} seconds, your reservation will freed up.")                           
+                                #print(f"\nYou exited the room! If you're not back within {max_time_out_of_room} seconds, your reservation will freed up.")
+                                prRed(f"\nYou exited the room! If you're not back within {max_time_out_of_room} seconds, your reservation will freed up.")                           
                                 print_status = True
                                 time_out = time.time()
 
@@ -120,11 +119,11 @@ def mode_one(): # Function one to reserve room
                                     continue
 
                                 else: # if person out too long, game over
-                                    print("\nYou took too long to come back! Your reservation is now cancelled.\nPress e to go back to menu")
+                                    prRed("\nYou took too long to come back! Your reservation is now cancelled.\nPress e to go back to menu")
                                     break
 
                             elif print_status:
-                                print(f"\n{name} still in room... (press 'y' to exit room (simulate Motion sensor2))")
+                                print(f"\n{name} is in the room... (press 'y' to exit room (simulate Motion sensor2))")
                                 print_status=False
                     else:
                         print("Name and/or password inccorect. Try again") 
@@ -145,25 +144,29 @@ def mode_one(): # Function one to reserve room
 
 
 def mode_two():
-    print_status = True # Boolean variable to be able to print only once when in While loops
-    year = datetime.now().year
-    month = datetime.now().month
-    day = datetime.now().day
-    print("\nUntil when should the ALARM be ON?: ")
+    print_status = True # Boolean variable to be able to print only once when in while loops
+    print("\nUntil when should the ALARM be ON?: ") # user input to choose times, ints
+    #year_user = int(input("year: "))
+    #month_user = int(input("month: "))
+    #day_user = int(input("day: "))    
     hour_user = int(input("hour: "))
     minute_user = int(input("minutes: "))
-    seconds = datetime.now().second
-    #last_second = seconds%10
-    countdown_to = datetime(year,month,day,hour_user,minute_user)
+
+    year = datetime.now().year # for testing purposes, fetch the current year month and day
+    month = datetime.now().month
+    day = datetime.now().day
+
+    countdown_to = datetime(year,month,day,hour_user,minute_user) # countdown variable until the selected time
     print("\nAlarm iniated at", datetime.now(), "until", countdown_to, "\n")
-    while datetime.now() < countdown_to:
-        if keyboard.is_pressed("y") or keyboard.is_pressed("x"):
+
+    while datetime.now() < countdown_to: # loop through time until countdown reached
+        if keyboard.is_pressed("y") or keyboard.is_pressed("x"): # simulate sensors
             prRed("INTRUDER INTRUDER INTRUDER INTRUDER INTRUDER INTRUDER")
-            while True:
+            while True: # loop to turn off alarm
                 answer=input("Please enter password to desactivate alarm: ")
                 if answer == password:
                     print("Alarm desactivated, back to alarm mode")
-                    print("ALARM MODE ON")
+                    prRed("ALARM MODE ON")
                     break
                 if answer == 'e':
                     break
@@ -177,37 +180,34 @@ def mode_two():
             print_status=False
 
 
-
-
 def mode_three():
     print_status=True
-    alive_status=0
+    alive_status=0 # variable in case timer reach 0 without motion -> alarm
+    B = 0  # workaround to print only once in the countdown loop, otherwise print many times due to too good precision of seconds
     year = datetime.now().year
     month = datetime.now().month
     day = datetime.now().day
-    print("\nHow long shoud the MONITORING be ON?: ")
-    hour_user = int(input("Hours: "))
     hour = datetime.now().hour
-    minutes = datetime.now().minute
-    if hour_user+hour>23:
-        hour_new = hour+hour_user-24
-        day = day+1
-        countdown_to = datetime(year,month,day,hour_new,minutes)
-    else:
-        countdown_to = datetime(year,month,day,hour+hour_user,minutes)
-    #minute_user = int(input("minutes: "))
-    seconds = datetime.now().second
-    #last_second = seconds%10
-    #countdown_to = datetime(year,month,day,hour_user)
-    #print(last_second)   
+    minute = datetime.now().minute
+
+    #print("\nHow long shoud the MONITORING be ON?: ")
+    #hour_user = int(input("Hours: "))
+    #if hour_user+hour>23: # if else to solve the +24hours problem
+    #    hour_new = hour+hour_user-24
+    #    day = day+1
+    #    countdown_to = datetime(year,month,day,hour_new,minutes)
+    #else:
+    #    countdown_to = datetime(year,month,day,hour+hour_user,minutes)
+
+    countdown_to = datetime(year,month,day,hour,minute+1) # testing countdown (time+1minute)
     print("\nCountdown initiated at ", datetime.now(), "until", countdown_to, "\n")
-    B = 0  # workaround to print only once in the loop, otherwise print many times due to precision of seconds
+
 
     while datetime.now() < countdown_to:
         
         countdown = int((countdown_to - datetime.now()).total_seconds())
         
-        if countdown%10 == 0 and B!=countdown: #countdown ever 10 seconds
+        if countdown%10 == 0 and B!=countdown: #countdown every 10 seconds, useful for quick testing, no need to wait one minute
         #if datetime.now().minute != last_minute: #countdown every minute
             time_left_seconds = int((countdown_to - datetime.now()).total_seconds())
             time_converted = str(timedelta(seconds=time_left_seconds))
@@ -226,9 +226,9 @@ def mode_three():
                 if hour_plus_twelve>23:
                     hour_new = hour_plus_twelve-24
                     day = datetime.now().day+1
-                    countdown_to = datetime(year,month,day,hour_new,minutes)
+                    countdown_to = datetime(year,month,day,hour_new,minute)
                 else:
-                    countdown_to = datetime(year,month,day,hour_plus_twelve,minutes)
+                    countdown_to = datetime(year,month,day,hour_plus_twelve,minute)
                 print("\nCountdown initiated at ", datetime.now(), "until", countdown_to, "\n")
                 continue
             elif answer=="n":
@@ -249,7 +249,7 @@ def mode_three():
    # if alive_status == 2:
         #print("Mode exited, back to menu")          
     if alive_status==0:  
-        print("ALERT, time reached without motion. SEND HELP") 
+        prRed("ALERT, time reached without motion. SEND HELP") 
     time.sleep(2)    
 
 """ def mode_three():
