@@ -3,7 +3,7 @@
 #from gpiozero import MotionSensor
 #from datetime import datetime
 #from signal import pause
-from Modes_term import *
+from modes_term import *
 
 # Main file for working in terminal.
 # issues : input staying in terminal, any way to remove directly after entering them? Mostly due to keyboard methods (doesnt press enter). Same issue with sensors?
