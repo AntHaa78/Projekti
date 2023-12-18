@@ -3,20 +3,22 @@ from datetime import datetime
 from datetime import timedelta
 import random
 import string
-from gpiozero import LED, MotionSensor
+#from gpiozero import LED, MotionSensor change
 import keyboard # Used to simulate sensors in testings without raspberry pi AND to exit modes at any time, not to delete. May cause errors
 from clockdisplay_minute_second import *
 import threading
-from graphics import *
-from animate import *
+#from graphics import * change
+#from animate import * change
 
 class Cancelled(Exception): pass
 
 #sense = SenseHat()
 
-pir1= MotionSensor(18) #inside sensor
+""" pir1= MotionSensor(18) #inside sensor change
 pir2 = MotionSensor(17) #outside sensor
-sense.clear()
+sense.clear() """
+
+
 
 green = (0, 255, 0)
 red = (255, 0, 0)
@@ -50,6 +52,13 @@ password = "abc123"
 #out_of_room_before_timer = 0 # used for function within mode 1. Need to improve
 
 
+def outside_sensor():
+    if keyboard.is_pressed('y'):
+        return True
+    if keyboard.is_pressed('e'):
+        return False
+
+
 def clear_sensor():
     pass
 
@@ -79,11 +88,11 @@ def mode_one(): # Function one to reserve room
     time_out = 0
     
     print_status = True # Boolean variable to be able to print only once when in While loops  
-    out_of_room_before_timer = 0  
-    #details=0 # variable used to check if user name/pw are correct
-    #room_occupied = 0
+    #out_of_room_before_timer = 0    to delete
+    #details=0 # variable used to check if user name/pw are correct to delete
+    #room_occupied = 0 to delete
 
-    motion_last_detected = 0 # counter to check when the person was last in room
+    motion_last_detected = 0 # counter to check when the person was last in room to delete
     max_time_out_of_room = 10 # adjust time (in seconds for test, for real use probably minutes) a person cna be outside the room while its reserved
 
     print("\nWelcome to the room reservation system")
@@ -98,41 +107,97 @@ def mode_one(): # Function one to reserve room
 
     while True:
         hour=(time.localtime()).tm_hour # get the local time hour
-        #time.sleep(0.05) # avoid permanent loop, was causing issues with the keyboard.is_pressed method
-        try:
+        time.sleep(0.05) # avoid permanent loop, was causing issues with the keyboard.is_pressed method to delete
+        #try: 
             if (hour>=start_time and hour<end_time): # check time compared to reservation
                 
                     
                 print(f"\nWaiting for 'someone' to show up...")
-                #sense.show_message("Varattu")
+                #sense.show_message("Varattu") to delete
                 print_status=False  
       
-                while status2 == 0:
-                    time.sleep(0.1)
+                #while status2 == 0:  change
+                #    time.sleep(0.1) change
                         # wait for sensor 2 outside to be activated 
+                
+                print("press 'x' to activate outdoor sensor, 'e' to exir")
+
+                if outside_sensor(): #change
+                    break              #change 
+
                 answer_name = input("\nWelcome visitor. Enter your name: ")
                 answer_password = input("Enter your password: ")
-                print("ID")
-                sense.show_message("ID")
+                print("ID check...") # change add check...
+                # sense.show_message("ID") change
                     
                 while (answer_name!=name or answer_password!=password): # as long as name/pwd incorrect, loop
                     print("Name and/or password inccorect. Try again") 
                     answer_name = input("\nWelcome visitor. Enter your name: ")
                     answer_password = input("Enter your password: ")
-                    print("ID")
-                    sense.show_message("ID")
+                    print("ID check...") #add check...
+                    #sense.show_message("ID") change
 
                 if (answer_name==name and answer_password==password):
                     print(f"\nWelcome {name} to your room!")
 
-                        #details=1
-                        #room_occupied=1
+                        #details=1 to delete
+                        #room_occupied=1 delete
                     print_status = True
 
-                    print(f"\n{name} is in the room... (awaiting Motion sensor1))")
-                        #sense.show_message("VARATTU")
+                    print(f"\n{name} is in the room... (awaiting Motion sensor1, 'x'))")
+                        #sense.show_message("VARATTU") delete
                     print_status=False
                     
+                    while True: # loop for detecting going outside, person already in room
+                        
+                        if keyboard.is_pressed("x"):
+                                
+                            
+                            prRed(f"\nYou exited the room! If you're not back within {max_time_out_of_room} seconds, your reservation will freed up.")                           
+                            print_status = True
+                            time_out = time.time()
+                            while motion_last_detected < max_time_out_of_room: # loop while the person is outside
+                                motion_last_detected = time.time() - time_out
+                                    #print(motion_last_detected)
+                                
+                                if keyboard.is_pressed("x"): # if motion detected outside (sensor 1)
+                                        
+                                    print(f"\nWelcome back {name}!")
+                                    print_status = True
+                                    break
+
+                                elif print_status:
+                                    print("\nAwaiting return... ( press 'x' to simulate motion sensor 1)")       
+                                    print_status=False
+
+                            if motion_last_detected < max_time_out_of_room: # if the person came back before timer, goes back to loop while inside the room
+                                continue
+
+                            else: # if person out too long, game over
+                                prRed("\nYou took too long to come back! Your reservation is now cancelled.\nPress e to go back to menu")
+                                break
+
+                        elif print_status:
+                            print(f"\n{name} is in the room... (press 'y' to exit room (simulate Motion sensor2))")
+                            print_status=False
+                    #if (answer_name=='e' and answer_password=='e'):
+                     #   print("Exiting mode")
+                      #  break 
+
+            elif print_status:
+                
+                print(f"\nWaiting for {name} to show up...")
+                print("To simulate motion sensor: press 'x' to detect Motion 1(outside) and 'y' to detect motion 2 (inside)")
+                print_status=False  
+
+
+        elif print_status: # if hour is not yet reached start time
+            print(f"\nNo reservation at {hour}. Next reservation at {start_time}")   
+            print_status=False    
+        
+                    """ ---------------------------------------------------------------------------
+                    BIG CHANGE
+
                     personCount = personCount + 1
                     status1 == 0
                     status2 == 0
@@ -209,7 +274,10 @@ def mode_one(): # Function one to reserve room
             print(f"\nNo reservation at {hour}. Next reservation at {start_time}") 
             sense.clear()
             #sense.show_message("VAPAA")  
-            print_status=False       
+            print_status=False      
+
+            --------------------------------------------------------------------------
+            BIG CHANGE """ 
 
 
 def sensor1Loop():

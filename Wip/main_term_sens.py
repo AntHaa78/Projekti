@@ -16,10 +16,10 @@ green = (0, 255, 0)
 red = (255, 0, 0)
 
 
-initAnimation()
+#initAnimation() change
 while True:
 	#mode_chosen=input("\nPlease choose a mode: (press 'e' at any point to exit the mode)\n1: Room booking\n2: Alert System \n3: Monitoring system \n\n")
-	mode_chosen=input("\nPlease choose a mode: \n1: Room booking\n2: Alert System \n3: Monitoring system \n4: Traffic Counter \n\n")
+	mode_chosen=input("\nPlease choose a mode: \n1: Room booking\n2: Alert System \n3: Monitoring system \n4: Traffic Counter \n\n'e' to exit.")
 	if mode_chosen=="1":
 		sense.show_letter(mode_chosen,blue)
 		mode_one()
@@ -37,4 +37,4 @@ while True:
 		sense.clear()
 		exit()
 	else:
-		print("\nCommand not recognised. Please choose 1-3")
+		print("\nCommand not recognised. Please choose 1-4")
