@@ -18,7 +18,9 @@ def initAnimation():
 	time.sleep(0.15)
 	showScreen(initGraphic7)
 	time.sleep(0.15)
-
+	showScreen(initGraphic8)
+	time.sleep(0.15)
+	
 def movementLeft():
 	showScreen(leftGraphic)
 
@@ -39,3 +41,4 @@ def smiley():
 	
 def dead():
 	showScreen(sad_face)
+	

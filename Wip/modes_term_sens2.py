@@ -10,12 +10,16 @@ import threading
 from graphics import *
 from animate import *
 
+class Cancelled(Exception): pass
 
 #sense = SenseHat()
 
 pir1= MotionSensor(18) #inside sensor
 pir2 = MotionSensor(17) #outside sensor
 sense.clear()
+
+green = (0, 255, 0)
+red = (255, 0, 0)
 
 status1 = 0     #sensor 1 status
 status2 = 0     #-||- 2
@@ -72,7 +76,7 @@ def mode_one(): # Function one to reserve room
     global status1
     global status2
     personCount = 0
-
+    time_out = 0
     
     print_status = True # Boolean variable to be able to print only once when in While loops  
     out_of_room_before_timer = 0  
@@ -80,7 +84,7 @@ def mode_one(): # Function one to reserve room
     #room_occupied = 0
 
     motion_last_detected = 0 # counter to check when the person was last in room
-    max_time_out_of_room = 5 # adjust time (in seconds for test, for real use probably minutes) a person cna be outside the room while its reserved
+    max_time_out_of_room = 10 # adjust time (in seconds for test, for real use probably minutes) a person cna be outside the room while its reserved
 
     print("\nWelcome to the room reservation system")
     name=input("\nEnter your name: ")
@@ -95,43 +99,45 @@ def mode_one(): # Function one to reserve room
     while True:
         hour=(time.localtime()).tm_hour # get the local time hour
         #time.sleep(0.05) # avoid permanent loop, was causing issues with the keyboard.is_pressed method
-
-        if (hour>=start_time and hour<end_time): # check time compared to reservation
-            
+        try:
+            if (hour>=start_time and hour<end_time): # check time compared to reservation
                 
-            print(f"\nWaiting for 'someone' to show up...")
-            #sense.show_message("Varattu")
-            print_status=False  
-  
-            while status2 == 0:
-                time.sleep(0.1)
-                    # wait for sensor 2 outside to be activated 
-            answer_name = input("\nWelcome visitor. Enter your name: ")
-            answer_password = input("Enter your password: ")
-            print("ID")
-            sense.show_message("ID")
-                
-            while (answer_name!=name or answer_password!=password): # as long as name/pwd incorrect, loop
-                print("Name and/or password inccorect. Try again") 
+                    
+                print(f"\nWaiting for 'someone' to show up...")
+                #sense.show_message("Varattu")
+                print_status=False  
+      
+                while status2 == 0:
+                    time.sleep(0.1)
+                        # wait for sensor 2 outside to be activated 
                 answer_name = input("\nWelcome visitor. Enter your name: ")
                 answer_password = input("Enter your password: ")
                 print("ID")
                 sense.show_message("ID")
+                    
+                while (answer_name!=name or answer_password!=password): # as long as name/pwd incorrect, loop
+                    print("Name and/or password inccorect. Try again") 
+                    answer_name = input("\nWelcome visitor. Enter your name: ")
+                    answer_password = input("Enter your password: ")
+                    print("ID")
+                    sense.show_message("ID")
 
-            if (answer_name==name and answer_password==password):
-                print(f"\nWelcome {name} to your room!")
-                personCount == 1
-                    #details=1
-                    #room_occupied=1
-                print_status = True
+                if (answer_name==name and answer_password==password):
+                    print(f"\nWelcome {name} to your room!")
 
-                while True: # loop for detecting going outside, person already in room
+                        #details=1
+                        #room_occupied=1
+                    print_status = True
+
                     print(f"\n{name} is in the room... (awaiting Motion sensor1))")
                         #sense.show_message("VARATTU")
                     print_status=False
                     
-                    
-                     while True:
+                    personCount = personCount + 1
+                    status1 == 0
+                    status2 == 0
+                    print("Sisällä on ",personCount," henkilöä.")
+                    while True:
                 #the main loop examines two global variables that are controlled by the sensor threads in order to determine what's happening.
                         if status1 > status2 and status2 > 0:  
                             dirTimer = 150
@@ -142,6 +148,11 @@ def mode_one(): # Function one to reserve room
                                     movementOut()
                                     if personCount > 0:
                                         personCount = personCount - 1
+                                    if personCount == 0:
+                                        prRed(f"\nNo-one left in the room! If you're not back within {max_time_out_of_room} seconds, your reservation will freed up.")                         
+                                        print_status = True
+                                        time_out = time.time()    
+                                    
                                     print("Sisällä on ",personCount," henkilöä.")
                                     time.sleep(1.2)      
                                     break                                
@@ -153,46 +164,40 @@ def mode_one(): # Function one to reserve room
                         elif status2 > status1 and status1 > 0:
                             dirTimer = 150
                             movementBoth()
-                            while dirTimer >= 0:
 
+                            while dirTimer >= 0:
                                 if status2 == 0 and status1 > 0:
                                     movementIn()
                                     personCount = personCount + 1
                                     print("Sisällä on ",personCount," henkilöä.")
-                                    time.sleep(1.2)      
+                                    time.sleep(1.2)   
                                     break                                #this function is from animate.py which shows a specific image from graphics.py
-                                elif status2 > 0 and status1 == 0:   
+                                elif status2 > 0 and status1 == 0: 
                                     break
                                 dirTimer = dirTimer - 1
                                 time.sleep(0.01)
+                                
+                                
+                                
+                        elif status1 != 0 and status2 == 0:         #movement detected only from the left.
+                            movementLeft()
+        
+                        elif status1 == 0 and status2 != 0: 
+                            movementRight()
             
                         else:
-                            sense.clear()
+                            if personCount > 0:
+                                sense.show_letter(str(personCount),green)
+                            else:
+                                sense.show_letter(str(personCount),red)
+                            
+                        if personCount == 0 and (time.time() - time_out) > max_time_out_of_room:
+                            raise Cancelled
                         time.sleep(0.02)
+                        
                     
-                    
-                    
-                    while True:
-                        if status1 == 1 and personCount < 2:
-                            prRed(f"\nYou exited the room! If you're not back within {max_time_out_of_room} seconds, your reservation will freed up.")
-                            #sense.show_message("OUT")                           
-                            print_status = True
-                            time_out = time.time()
-
-                            while (motion_last_detected < max_time_out_of_room and status2==0): # loop while the person is outside
-                                time.sleep(0.01)
-                                motion_last_detected = time.time() - time_out
-
-                            if motion_last_detected < max_time_out_of_room: # if the person came back before timer, goes back to loop while inside the room
-                                print(f"{name} is back in the room!!")
-                                time_out = time.time()
-                                continue
-
-                            else: #if person out too long, game over
-                                prRed(f"\nYou took too long to come back{name}! Your reservation is now cancelled.\nPress e to go back to menu")
-                                break
-                            
-                            
+        except Cancelled:
+            prRed(f"\nYou took too long to come back{name}! Your reservation is now cancelled.\nPress e to go back to menu")
 
 
         if keyboard.is_pressed("e"): #exit mode alarm
@@ -208,37 +213,36 @@ def mode_one(): # Function one to reserve room
 
 
 def sensor1Loop():
-    sensorTimer = 0
     global status1
-    while True:
+    global status2
+    
+    while True: 
         if pir1.motion_detected:
-            #print("sensor1 active!")
-            status1 = 1
-            sensorTimer = 120
-            pir1.wait_for_no_motion()
-        
-        if sensorTimer > 0:
-            sensorTimer = sensorTimer - 1
-            if sensorTimer == 0 and status1 > 0:
-                status1 = 0
+            if status2 == 0:        #if the other sensor hasn't detected anything recently, this sensor gets the higher status (and vice versa)
+                status1 = 2
+            else:
+                status1 = 1
+            time.sleep(1.8)
+            status1 = 0
         time.sleep(0.01)
+        
     
 def sensor2Loop():
-    sensorTimer = 0
+    global status1
     global status2
-    while True:
-        if pir2.motion_detected:
-            #print("sensor2 active!")
-            status2 = 1
-            sensorTimer = 120
-            pir1.wait_for_no_motion()
-        
-        if sensorTimer > 0:
-            sensorTimer = sensorTimer - 1
-            if sensorTimer == 0 and status2 > 0:
-                status2 = 0
-        time.sleep(0.01)
 
+    while True:
+        
+        if pir2.motion_detected:
+            if status1 == 0:
+                status2 = 2
+            else:
+                status2 = 1
+            time.sleep(1.8)
+            status2 = 0
+        time.sleep(0.01)
+        
+        
 def alarm_on():
     prRed("INTRUDER INTRUDER INTRUDER INTRUDER INTRUDER INTRUDER")
     sense.show_letter("!", text_colour=red)
