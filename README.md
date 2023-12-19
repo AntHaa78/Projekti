@@ -13,7 +13,8 @@ Monitoring for example of a sick/elderly relative and making sure they move duri
 
 -------------------------------------------------------------------------------------------------------------------------------------------
 
-Main + (modes+animate+graphics) : Main program working WITH raspberry Pi sensors and annex files-
+Main + (modes+animate+graphics) : Main program working WITH raspberry Pi sensors and annex files.
+
 clock_display_minute_second: Work in progress to show timedown on raspberry Pi sensehat.
 
 ------------------------------------------------------------------------------------------------------------------------------------------
