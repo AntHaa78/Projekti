@@ -4,7 +4,7 @@ from datetime import timedelta
 import random
 import string
 from gpiozero import LED, MotionSensor
-import keyboard # Used to simulate sensors in testings without raspberry pi AND to exit modes at any time, not to delete. May cause errors
+import keyboard # Used to simulate sensors in testings without raspberry pi. Now to to exit modes at any time ('e')
 from clockdisplay_minute_second import *
 import threading
 from graphics import *
@@ -24,13 +24,7 @@ blue = (0,0,255)
 status1 = 0     #sensor 1 status
 status2 = 0     #-||- 2
 
-#global alive_status
-#alive_status = 0
-
 # mode one - room reservation mode
-# For now, to check it make sure to select a start time before or equal to current hour and end time after current hour
-# Can select hour that already passed
-# To implement later : days, and error if selecting passed hour when reserving. Add counter for another person enter the room then make sure room is empty at the end.
 
 
 # mode two - Alarm mode
@@ -50,24 +44,8 @@ def prGreen(skk): print("\033[92m {}\033[00m" .format(skk))
 password = "abc123"
 
 
-#out_of_room_before_timer = 0 # used for function within mode 1. Need to improve
-
-def again_or_not():
-	answer = input("\nMode exited. Do you want to go back to menu(1) or exit(2)?: ")
-	while (answer!='1' and answer!='2' and answer!='e1' and answer!='e2'):
-		print(answer)
-		print("Command not recognised. Type '1' or '2' only")
-		answer = input("\nDo you want to go back to menu(1) or exit(2)?: ")
-	if (answer == '1' or answer=='e1'):
-		print("Back to menu.")
-		return True
-	if (answer == '2' or answer=='e2'):
-		print("Exiting. BYE")
-        #return False
-
 def back_to_menu():
     print("Exiting current mode. Going back to menu")
-
 
 def clear_sensor():
     pass
@@ -85,7 +63,7 @@ def password_generator(): # basic password generator function, only lower case l
     result_pw = ''.join(random.choice(letters) for i in range(length))
     return result_pw        
 
-def mode_one(): # Function one to reserve room. Need to implement calendar/more dates choice. Currently only current month
+def mode_one(): # Function one to reserve room. Need to implement calendar/more dates choice later. Currently only current month
     
     sensorThread1 = threading.Thread(target=sensor1Loop)   #One thread is assigned to a function (using target=function)
     sensorThread2 = threading.Thread(target=sensor2Loop)   
@@ -126,7 +104,7 @@ def mode_one(): # Function one to reserve room. Need to implement calendar/more 
 
     while True:
          
-        #time.sleep(0.05) # avoid permanent loop, was causing issues with the keyboard.is_pressed method
+        #time.sleep(0.05) # to avoid permanent loop, was causing issues with the keyboard.is_pressed method
         try:
             if (hour>=start_time and hour<end_time and day_user==day): # check time compared to reservation
                 
@@ -330,7 +308,6 @@ def mode_two():
 
 def mode_three():
     
-    #motion_detected=False # variable to set if motion
     alive_status=0 # variable in case timer reach 0 without motion -> alarm
     B = 0  # workaround to print only once in the countdown loop, otherwise print many times due to too good precision of seconds
     year = datetime.now().year
@@ -339,6 +316,7 @@ def mode_three():
     hour = datetime.now().hour
     minute = datetime.now().minute
 
+	# Code of block for user to choose himself lentgh of alarm, instead of the +2 minute in testings.
     #print("\nHow long shoud the MONITORING be going before alarm (max 24h)?: ")
     #hour_user = int(input("Hours: "))
     #if hour_user+hour>23: # if else to solve the +24hours problem
@@ -350,10 +328,9 @@ def mode_three():
 
     countdown_to = datetime(year,month,day,hour,minute+2) # testing countdown (time+2minute)
     print("\nCountdown initiated at ", datetime.now(), "until", countdown_to, " Press 'e' to exit at any time.\n")
-    #print("Press 'e' to exit at any time")
 
     while True:
-        #while (datetime.now() < countdown_to and pir2.motion_detected==False):
+
         print_status=True
         while datetime.now() < countdown_to:
             time.sleep(0.05)
@@ -383,7 +360,7 @@ def mode_three():
 
         if alive_status==1:
             if print_status:
-                smiley()
+                smiley() # show smiley on sensehat
                 print("Automatically adding 24 hours to monitoring.")
                 new_day=(datetime.now().day)+1
                 countdown_to = datetime(year,month,new_day,hour,minute)
@@ -406,5 +383,5 @@ def mode_three():
         print("\n")          
     if alive_status==0:  
         prRed("ALERT, time reached without motion. SEND HELP") 
-        dead()
+        dead() # show sad face on sensehat
     time.sleep(2)    
