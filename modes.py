@@ -24,12 +24,15 @@ blue = (0,0,255)
 status1 = 0     #sensor 1 status
 status2 = 0     #-||- 2
 
+
 # mode one - room reservation mode
+#to improve: better time system reservation. name only with letters?
 
 
 # mode two - Alarm mode
 # When going to work, going on holidays etc... and house is empty. Activate alarm until desired date. For now only same day for testing purposes, easily modifiable.
 # once motion is detected -> alarm beeps. need to answer password to desactivate alarm
+# to improve: clean up terminal, sometimes letter stays on
 
 
 # mode three - monitoring mode (ex: retirement homes)
@@ -255,10 +258,9 @@ def alarm_on():
     sense.show_letter("!", text_colour=red)
     answer=input("Please enter password to desactivate alarm: ")
     while answer!=password:
-        print("Wrong password, alarm still beeping") 
+        prRed("Wrong password, alarm still beeping") 
         answer=input("Please enter password to desactivate alarm: ")
-    print("Alarm desactivated.")
-    print("\nALARM MODE ON")
+    prGreen("\nAlarm desactivated. Timer not reached, back to surveillance. 'e' to exit")
     sense.show_letter("O", text_colour=green)
 
 
@@ -289,19 +291,36 @@ def mode_two():
         pir1.when_motion = alarm_on
                 
         if keyboard.is_pressed("e"): #exit mode alarm
-            print("\nALARM DESACTIVATED.")
-            countdown_reached = 0
-            sense.clear()
-            break
+            answer = input("Do you wish to turn off alarm?(y/n): ")
+            if answer == "y":
+                password_entered=input("Please enter password to desactivate alarm: ")
+                if password_entered!=password:
+                    prRed("Wrong password, alarm not desactvated.") 
+                    pass
+                elif password_entered==password:
+                    prGreen("\nALARM DESACTIVATED.")
+                    countdown_reached = 0
+                    sense.clear()
+                    break  
+
+            if answer == "n":
+                print("Alarm back on.")
+                pass  
+            elif (answer != "y" or answer != "n"):
+                print("Command not recognised. Alarm back on")
+                pass
+           
+            
+            
     if countdown_reached == 1:
-        print("Timer reached, ALARM OFF.")
+        prGreen("Timer reached, ALARM OFF.")
         sense.show_letter("O", text_colour=red)
         pir2.when_motion = clear_sensor
         pir1.when_motion = clear_sensor
         time.sleep(2)
     
     if countdown_reached==0:
-        #print("Back to menu")
+
         pir2.when_motion = clear_sensor
         pir1.when_motion = clear_sensor
 
